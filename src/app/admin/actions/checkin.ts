@@ -60,7 +60,10 @@ export async function checkInByKupon(kuponCode: string): Promise<CheckInResult> 
     .single();
 
   if (error) {
-    return { success: false, error: "Gagal melakukan check-in." };
+    return {
+      success: false,
+      error: `Gagal check-in: ${error.message || error.code || "unknown error"}`,
+    };
   }
 
   if (!data) {
@@ -85,7 +88,10 @@ export async function quickCheckIn(id: string): Promise<CheckInResult> {
     .single();
 
   if (error) {
-    return { success: false, error: "Gagal melakukan check-in." };
+    return {
+      success: false,
+      error: `Gagal check-in: ${error.message || error.code || "unknown error"}`,
+    };
   }
 
   if (!data) {
