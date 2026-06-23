@@ -34,18 +34,23 @@ export async function searchByKupon(
   const { data, error } = await supabase
     .from("peserta")
     .select("id, nama, no_wa, kupon_code, status, checked_in_at, created_at")
-    .eq("kupon_code", kuponCode)
-    .single();
+    .eq("kupon_code", kuponCode);
 
-  if (error || !data) {
+  if (error) {
+    return { data: null, error: `Gagal mencari kupon: ${error.message}` };
+  }
+
+  if (!data || data.length === 0) {
     return { data: null, error: "Kupon tidak ditemukan." };
   }
 
-  if (data.status === "hadir") {
-    return { data, error: "Peserta ini sudah berstatus hadir sebelumnya." };
+  const peserta = data[0];
+
+  if (peserta.status === "hadir") {
+    return { data: peserta, error: "Peserta ini sudah berstatus hadir sebelumnya." };
   }
 
-  return { data, error: null };
+  return { data: peserta, error: null };
 }
 
 export async function checkInByKupon(kuponCode: string): Promise<CheckInResult> {
@@ -56,20 +61,19 @@ export async function checkInByKupon(kuponCode: string): Promise<CheckInResult> 
     .update({ status: "hadir", checked_in_at: new Date().toISOString() })
     .eq("kupon_code", kuponCode)
     .eq("status", "terdaftar")
-    .select("id")
-    .single();
+    .select("id");
 
   if (error) {
     return {
       success: false,
-      error: `Gagal check-in: ${error.message || error.code || "unknown error"}`,
+      error: `Gagal check-in: ${error.message}`,
     };
   }
 
-  if (!data) {
+  if (!data || data.length === 0) {
     return {
       success: false,
-      error: "Peserta tidak ditemukan atau sudah hadir.",
+      error: "Kupon tidak ditemukan atau sudah pernah hadir.",
     };
   }
 
@@ -84,17 +88,16 @@ export async function quickCheckIn(id: string): Promise<CheckInResult> {
     .update({ status: "hadir", checked_in_at: new Date().toISOString() })
     .eq("id", id)
     .eq("status", "terdaftar")
-    .select("id")
-    .single();
+    .select("id");
 
   if (error) {
     return {
       success: false,
-      error: `Gagal check-in: ${error.message || error.code || "unknown error"}`,
+      error: `Gagal check-in: ${error.message}`,
     };
   }
 
-  if (!data) {
+  if (!data || data.length === 0) {
     return {
       success: false,
       error: "Peserta tidak ditemukan atau sudah hadir.",

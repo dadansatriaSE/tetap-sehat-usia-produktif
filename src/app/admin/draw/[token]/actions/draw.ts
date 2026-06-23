@@ -57,19 +57,18 @@ export async function confirmWinner(id: string): Promise<DrawResult> {
     .update({ is_pemenang: true, menang_at: new Date().toISOString() })
     .eq("id", id)
     .eq("is_pemenang", false)
-    .select("id, nama, no_wa, kupon_code")
-    .single();
+    .select("id, nama, no_wa, kupon_code");
 
   if (error) {
     return { success: false, error: "Gagal mengkonfirmasi pemenang." };
   }
 
-  if (!data) {
+  if (!data || data.length === 0) {
     return {
       success: false,
       error: "Peserta sudah dikonfirmasi sebagai pemenang.",
     };
   }
 
-  return { success: true, winner: data };
+  return { success: true, winner: data[0] };
 }
