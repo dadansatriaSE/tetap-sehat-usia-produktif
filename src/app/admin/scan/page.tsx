@@ -20,35 +20,36 @@ export default function ScanPage() {
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const processKupon = useCallback(
-    async (kuponCode: string) => {
-      if (checking || !kuponCode.trim()) return;
-      setChecking(true);
-      setScanResult(null);
+  const processingRef = useRef(false);
 
-      const result = await checkInByKupon(kuponCode.trim());
+  const processKupon = useCallback(async (kuponCode: string) => {
+    if (processingRef.current || !kuponCode.trim()) return;
+    processingRef.current = true;
+    setChecking(true);
+    setScanResult(null);
 
-      if (result.success) {
-        setScanResult({
-          type: "success",
-          peserta: {
-            id: "",
-            nama: "",
-            no_wa: "",
-            kupon_code: kuponCode.trim(),
-            status: "hadir",
-            checked_in_at: new Date().toISOString(),
-            created_at: "",
-          },
-        });
-      } else {
-        setScanResult({ type: "error", message: result.error });
-      }
+    const result = await checkInByKupon(kuponCode.trim());
 
-      setChecking(false);
-    },
-    [checking]
-  );
+    if (result.success) {
+      setScanResult({
+        type: "success",
+        peserta: {
+          id: "",
+          nama: "",
+          no_wa: "",
+          kupon_code: kuponCode.trim(),
+          status: "hadir",
+          checked_in_at: new Date().toISOString(),
+          created_at: "",
+        },
+      });
+    } else {
+      setScanResult({ type: "error", message: result.error });
+    }
+
+    setChecking(false);
+    processingRef.current = false;
+  }, []);
 
   const startCamera = useCallback(async () => {
     if (cameraActive) return;
@@ -65,13 +66,14 @@ export default function ScanPage() {
           aspectRatio: 1.0,
         },
         async (decodedText) => {
-          await processKupon(decodedText);
+          if (processingRef.current) return;
           try {
             await scanner.stop();
           } catch {
             /* ignore */
           }
           setCameraActive(false);
+          await processKupon(decodedText);
         },
         () => {
           /* ignore scan failures */
