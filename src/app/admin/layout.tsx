@@ -26,16 +26,16 @@ export default function AdminLayout({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-sky-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-sky-50">
       {/* Header */}
-      <header className="bg-white/90 backdrop-blur-sm border-b border-emerald-100 shadow-sm sticky top-0 z-40">
+      <header className="bg-white/90 backdrop-blur-sm border-b border-blue-100 shadow-sm sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
-              <span className="text-2xl">🌿</span>
+              <span className="text-2xl">💙</span>
               <div>
-                <p className="font-bold text-emerald-800 text-sm leading-tight">Tetap Sehat</p>
-                <p className="text-xs text-emerald-600 leading-tight">di Usia Produktif</p>
+                <p className="font-bold text-blue-800 text-sm leading-tight">Tetap Sehat</p>
+                <p className="text-xs text-blue-600 leading-tight">di Usia Produktif</p>
               </div>
             </div>
             <nav className="flex items-center gap-1">
@@ -45,8 +45,8 @@ export default function AdminLayout({
                   href={link.href}
                   className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg transition-all font-medium ${
                     pathname === link.href
-                      ? "bg-emerald-100 text-emerald-800 shadow-sm"
-                      : "text-gray-500 hover:text-emerald-700 hover:bg-emerald-50"
+                      ? "bg-blue-100 text-blue-800 shadow-sm"
+                      : "text-gray-500 hover:text-blue-700 hover:bg-blue-50"
                   }`}
                 >
                   <span className="text-base">{link.icon}</span>
@@ -56,9 +56,9 @@ export default function AdminLayout({
             </nav>
           </div>
           <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-              <span className="text-xs font-medium text-emerald-700">Admin</span>
+            <div className="hidden sm:flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100">
+              <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+              <span className="text-xs font-medium text-blue-700">Admin</span>
             </div>
             <Button
               variant="outline"
@@ -76,13 +76,13 @@ export default function AdminLayout({
       <main className="max-w-6xl mx-auto p-4 md:p-6">{children}</main>
 
       {/* Footer */}
-      <footer className="border-t border-emerald-100 bg-white/50 py-3 mt-8">
+      <footer className="border-t border-blue-100 bg-white/50 py-3 mt-8">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <p className="text-xs text-muted-foreground">
             Panel Admin &bull; Tetap Sehat di Usia Produktif &bull; Dibuat oleh{" "}
-            <span className="font-semibold text-emerald-700">Dadan Satria</span>
+            <span className="font-semibold text-blue-700">Dadan Satria</span>
             {" "}·{" "}
-            <a href="tel:08813224569" className="text-emerald-600 hover:underline">08813224569</a>
+            <a href="tel:08813224569" className="text-blue-600 hover:underline">08813224569</a>
           </p>
         </div>
       </footer>

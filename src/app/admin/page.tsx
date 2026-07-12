@@ -164,8 +164,8 @@ export default function AdminPage() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center space-y-3">
-          <div className="text-4xl animate-bounce">🌿</div>
-          <p className="text-emerald-600 font-medium">Memuat data peserta...</p>
+          <div className="text-4xl animate-bounce">💙</div>
+          <p className="text-blue-600 font-medium">Memuat data peserta...</p>
         </div>
       </div>
     );
@@ -176,22 +176,22 @@ export default function AdminPage() {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-emerald-900">📊 Dashboard Peserta</h1>
+          <h1 className="text-xl font-bold text-blue-900">📊 Dashboard Peserta</h1>
           <p className="text-sm text-muted-foreground">Seminar Kesehatan &bull; Tetap Sehat di Usia Produktif</p>
         </div>
-        <div className="text-3xl animate-float">🌿</div>
+        <div className="text-3xl animate-float">💙</div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="border-0 shadow-md bg-gradient-to-br from-emerald-500 to-emerald-700 text-white card-hover">
+        <Card className="border-0 shadow-md bg-gradient-to-br from-blue-600 to-blue-800 text-white card-hover">
           <CardHeader>
-            <CardTitle className="text-sm font-medium text-emerald-100 flex items-center gap-2">
+            <CardTitle className="text-sm font-medium text-blue-100 flex items-center gap-2">
               👥 Total Peserta
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-extrabold">{total}</div>
-            <p className="text-xs text-emerald-200 mt-1">peserta terdaftar</p>
+            <p className="text-xs text-blue-200 mt-1">peserta terdaftar</p>
           </CardContent>
         </Card>
         <Card className="border-0 shadow-md bg-gradient-to-br from-sky-500 to-sky-700 text-white card-hover">
@@ -219,8 +219,8 @@ export default function AdminPage() {
       </div>
 
       <Card className="border-0 shadow-md">
-        <CardHeader className="bg-gradient-to-r from-emerald-50 to-sky-50 border-b border-emerald-100 rounded-t-xl">
-          <CardTitle className="text-emerald-800 flex items-center gap-2">📷 Check-in Peserta</CardTitle>
+        <CardHeader className="bg-gradient-to-r from-blue-50 to-sky-50 border-b border-blue-100 rounded-t-xl">
+          <CardTitle className="text-blue-800 flex items-center gap-2">📷 Check-in Peserta</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-2">
@@ -270,13 +270,13 @@ export default function AdminPage() {
           placeholder="Cari berdasarkan nama, no WA, atau kode kupon..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-9 rounded-xl border-emerald-200 focus:border-emerald-400 h-11"
+          className="pl-9 rounded-xl border-blue-200 focus:border-blue-400 h-11"
         />
       </div>
 
       <Card className="border-0 shadow-md overflow-hidden">
-        <div className="bg-gradient-to-r from-emerald-50 to-sky-50 border-b border-emerald-100 px-4 py-3 flex items-center justify-between">
-          <p className="font-semibold text-emerald-800 text-sm">👥 Daftar Peserta <span className="text-emerald-600 font-normal">({filtered.length} ditampilkan)</span></p>
+        <div className="bg-gradient-to-r from-blue-50 to-sky-50 border-b border-blue-100 px-4 py-3 flex items-center justify-between">
+          <p className="font-semibold text-blue-800 text-sm">👥 Daftar Peserta <span className="text-blue-600 font-normal">({filtered.length} ditampilkan)</span></p>
         </div>
         <CardContent className="p-0">
           <Table>
