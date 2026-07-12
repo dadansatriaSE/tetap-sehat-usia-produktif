@@ -163,49 +163,64 @@ export default function AdminPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <p className="text-muted-foreground">Memuat data peserta...</p>
+        <div className="text-center space-y-3">
+          <div className="text-4xl animate-bounce">🌿</div>
+          <p className="text-emerald-600 font-medium">Memuat data peserta...</p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
+      {/* Page Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-emerald-900">📊 Dashboard Peserta</h1>
+          <p className="text-sm text-muted-foreground">Seminar Kesehatan &bull; Tetap Sehat di Usia Produktif</p>
+        </div>
+        <div className="text-3xl animate-float">🌿</div>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card>
+        <Card className="border-0 shadow-md bg-gradient-to-br from-emerald-500 to-emerald-700 text-white card-hover">
           <CardHeader>
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Peserta
+            <CardTitle className="text-sm font-medium text-emerald-100 flex items-center gap-2">
+              👥 Total Peserta
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{total}</div>
+            <div className="text-3xl font-extrabold">{total}</div>
+            <p className="text-xs text-emerald-200 mt-1">peserta terdaftar</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border-0 shadow-md bg-gradient-to-br from-sky-500 to-sky-700 text-white card-hover">
           <CardHeader>
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Sudah Hadir
+            <CardTitle className="text-sm font-medium text-sky-100 flex items-center gap-2">
+              ✅ Sudah Hadir
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{hadir}</div>
+            <div className="text-3xl font-extrabold">{hadir}</div>
+            <p className="text-xs text-sky-200 mt-1">dari {total} peserta</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border-0 shadow-md bg-gradient-to-br from-teal-500 to-teal-700 text-white card-hover">
           <CardHeader>
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Persentase Kehadiran
+            <CardTitle className="text-sm font-medium text-teal-100 flex items-center gap-2">
+              📊 Persentase Kehadiran
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{percentage}%</div>
+            <div className="text-3xl font-extrabold">{percentage}%</div>
+            <p className="text-xs text-teal-200 mt-1">tingkat kehadiran</p>
           </CardContent>
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Check-in Peserta</CardTitle>
+      <Card className="border-0 shadow-md">
+        <CardHeader className="bg-gradient-to-r from-emerald-50 to-sky-50 border-b border-emerald-100 rounded-t-xl">
+          <CardTitle className="text-emerald-800 flex items-center gap-2">📷 Check-in Peserta</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-2">
@@ -249,15 +264,20 @@ export default function AdminPage() {
         </CardContent>
       </Card>
 
-      <div>
+      <div className="relative">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
         <Input
           placeholder="Cari berdasarkan nama, no WA, atau kode kupon..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          className="pl-9 rounded-xl border-emerald-200 focus:border-emerald-400 h-11"
         />
       </div>
 
-      <Card>
+      <Card className="border-0 shadow-md overflow-hidden">
+        <div className="bg-gradient-to-r from-emerald-50 to-sky-50 border-b border-emerald-100 px-4 py-3 flex items-center justify-between">
+          <p className="font-semibold text-emerald-800 text-sm">👥 Daftar Peserta <span className="text-emerald-600 font-normal">({filtered.length} ditampilkan)</span></p>
+        </div>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
