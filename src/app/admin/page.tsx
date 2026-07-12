@@ -6,6 +6,7 @@ import {
   searchByKupon,
   checkInByKupon,
   quickCheckIn,
+  deletePeserta,
   type Peserta,
 } from "./actions/checkin";
 import { Input } from "@/components/ui/input";
@@ -30,6 +31,13 @@ export default function AdminPage() {
   const [kuponError, setKuponError] = useState<string | null>(null);
   const [kuponLoading, setKuponLoading] = useState(false);
   const [checkingInId, setCheckingInId] = useState<string | null>(null);
+
+  // State for delete verification
+  const [deleteConfirmTarget, setDeleteConfirmTarget] = useState<Peserta | null>(null);
+  const [deleteStep, setDeleteStep] = useState<1 | 2>(1);
+  const [deleteInputText, setDeleteInputText] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -104,6 +112,52 @@ export default function AdminPage() {
     setCheckingInId(id);
     await quickCheckIn(id);
     setCheckingInId(null);
+  };
+
+  const handleDeleteClick = (p: Peserta) => {
+    setDeleteConfirmTarget(p);
+    setDeleteStep(1);
+    setDeleteInputText("");
+    setDeleteError(null);
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteConfirmTarget(null);
+    setDeleteStep(1);
+    setDeleteInputText("");
+    setDeleteError(null);
+  };
+
+  const handleLanjutkanDelete = () => {
+    setDeleteStep(2);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteConfirmTarget) return;
+    if (deleteInputText.trim().toLowerCase() !== "hapus") {
+      setDeleteError("Anda harus mengetik 'HAPUS' untuk mengonfirmasi.");
+      return;
+    }
+
+    setDeletingId(deleteConfirmTarget.id);
+    setDeleteError(null);
+
+    try {
+      const result = await deletePeserta(deleteConfirmTarget.id);
+      if (result.success) {
+        setDeleteConfirmTarget(null);
+        setDeleteStep(1);
+        setDeleteInputText("");
+        fetchData(); // Refresh data
+      } else {
+        setDeleteError(result.error || "Gagal menghapus peserta.");
+      }
+    } catch (err: unknown) {
+      const errorObj = err as Error;
+      setDeleteError(errorObj.message || "Gagal menghapus peserta.");
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   if (loading) {
@@ -251,16 +305,26 @@ export default function AdminPage() {
                         : "-"}
                     </TableCell>
                     <TableCell className="text-right">
-                      {p.status === "terdaftar" && (
+                      <div className="flex justify-end gap-2">
+                        {p.status === "terdaftar" && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleQuickCheckIn(p.id)}
+                            disabled={checkingInId === p.id || deletingId === p.id}
+                          >
+                            {checkingInId === p.id ? "..." : "Check-in"}
+                          </Button>
+                        )}
                         <Button
                           size="sm"
-                          variant="outline"
-                          onClick={() => handleQuickCheckIn(p.id)}
-                          disabled={checkingInId === p.id}
+                          variant="destructive"
+                          onClick={() => handleDeleteClick(p)}
+                          disabled={checkingInId === p.id || deletingId === p.id}
                         >
-                          {checkingInId === p.id ? "..." : "Check-in"}
+                          Hapus
                         </Button>
-                      )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
@@ -269,6 +333,73 @@ export default function AdminPage() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Pop Up Verifikasi 2 Langkah Hapus */}
+      {deleteConfirmTarget && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <Card className="w-full max-w-md border-red-100 shadow-2xl animate-in fade-in zoom-in duration-200">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg font-bold text-red-700 flex items-center gap-2">
+                ⚠️ Verifikasi Hapus Peserta
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 pt-2">
+              {deleteStep === 1 ? (
+                <>
+                  <p className="text-sm text-foreground text-left">
+                    Apakah Anda yakin ingin menghapus peserta berikut?
+                  </p>
+                  <div className="bg-red-50/50 border border-red-100 rounded-lg p-3 space-y-1 text-sm text-left">
+                    <p><strong>Nama:</strong> {deleteConfirmTarget.nama}</p>
+                    <p><strong>No WA:</strong> {deleteConfirmTarget.no_wa}</p>
+                    <p><strong>Kode Kupon:</strong> {deleteConfirmTarget.kupon_code}</p>
+                  </div>
+                  <div className="flex gap-2 justify-end pt-2">
+                    <Button variant="outline" onClick={handleCancelDelete}>
+                      Batal
+                    </Button>
+                    <Button variant="default" onClick={handleLanjutkanDelete}>
+                      Lanjutkan Hapus
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm text-foreground text-left">
+                    Langkah Terakhir: Ketik kata <span className="font-bold text-red-600">&quot;HAPUS&quot;</span> di bawah ini untuk mengonfirmasi bahwa Anda ingin menghapus secara permanen.
+                  </p>
+                  <div className="space-y-2">
+                    <Input
+                      placeholder="Ketik HAPUS"
+                      value={deleteInputText}
+                      onChange={(e) => setDeleteInputText(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && deleteInputText.trim().toLowerCase() === "hapus") handleConfirmDelete();
+                      }}
+                      className="border-red-200 focus-visible:ring-red-500"
+                    />
+                    {deleteError && (
+                      <p className="text-xs text-red-600 font-medium text-left">{deleteError}</p>
+                    )}
+                  </div>
+                  <div className="flex gap-2 justify-end pt-2">
+                    <Button variant="outline" onClick={handleCancelDelete} disabled={deletingId !== null}>
+                      Batal
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={handleConfirmDelete}
+                      disabled={deletingId !== null || deleteInputText.trim().toLowerCase() !== "hapus"}
+                    >
+                      {deletingId !== null ? "Menghapus..." : "Hapus Permanen"}
+                    </Button>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

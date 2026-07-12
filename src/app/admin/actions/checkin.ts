@@ -113,3 +113,16 @@ export async function quickCheckIn(id: string): Promise<CheckInResult> {
     };
   }
 }
+
+export async function deletePeserta(id: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const data = await sql`DELETE FROM peserta WHERE id = ${id} RETURNING id`;
+    if (!data || data.length === 0) {
+      return { success: false, error: "Peserta tidak ditemukan." };
+    }
+    return { success: true };
+  } catch (err: unknown) {
+    const errorObj = err as Error;
+    return { success: false, error: `Gagal menghapus peserta: ${errorObj.message}` };
+  }
+}
