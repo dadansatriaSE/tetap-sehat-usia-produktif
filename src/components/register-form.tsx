@@ -10,8 +10,8 @@ import { Card, CardContent } from "@/components/ui/card";
 
 type KuponData = { nama: string; no_wa: string; kupon_code: string };
 
-const EVENT_DATE = "Minggu, 29 Juni 2026";
-const EVENT_TIME = "08:00 WIB – Selesai";
+const EVENT_DATE = "Minggu, 19 Juli 2026";
+const EVENT_TIME = "10:00 WIB – Selesai";
 const EVENT_LOCATION = "Masjid Jami' Sosrohadisewoyo";
 const EVENT_ADDRESS = "Pelem II, Pelem, Kec. Ngawi";
 const EVENT_RULES = [
