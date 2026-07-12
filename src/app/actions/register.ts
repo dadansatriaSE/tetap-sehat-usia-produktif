@@ -1,6 +1,6 @@
 "use server";
 
-import { createClientServer } from "@/lib/supabase/server";
+import { sql } from "@/lib/db";
 import { normalizePhone, isValidIndonesianPhone } from "@/lib/phone";
 
 export type RegisterResult =
@@ -32,47 +32,43 @@ export async function registerPeserta(
       };
     }
 
-    const supabase = createClientServer();
+    // Check if phone number is already registered
+    const existing = await sql`SELECT id FROM peserta WHERE no_wa = ${no_wa} LIMIT 1`;
 
-    const { data: existing } = await supabase
-      .from("peserta")
-      .select("id")
-      .eq("no_wa", no_wa)
-      .single();
-
-    if (existing) {
+    if (existing && existing.length > 0) {
       return {
         success: false,
         error: "Nomor WhatsApp ini sudah terdaftar, satu nomor hanya bisa daftar sekali.",
       };
     }
 
-    const { data, error } = await supabase
-      .from("peserta")
-      .insert({ nama, no_wa })
-      .select("nama, no_wa, kupon_code")
-      .single();
+    // Insert new registration
+    const inserted = await sql`INSERT INTO peserta (nama, no_wa) VALUES (${nama}, ${no_wa}) RETURNING nama, no_wa, kupon_code`;
 
-    if (error) {
-      console.error("[register] Supabase insert error:", error);
-      if (error.code === "23505") {
-        return {
-          success: false,
-          error: "Nomor WhatsApp ini sudah terdaftar, satu nomor hanya bisa daftar sekali.",
-        };
-      }
-      return { success: false, error: `Gagal mendaftar. Silakan coba lagi. (${error.code ?? error.message})` };
+    if (!inserted || inserted.length === 0) {
+      return { success: false, error: "Gagal mendaftar. Silakan coba lagi." };
     }
+
+    const data = inserted[0] as unknown as { nama: string; no_wa: string; kupon_code: string };
 
     return { success: true, data };
   } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e);
+    const errorObj = e as { code?: string; message?: string };
+    const msg = errorObj.message || String(e);
     console.error("[register] Unexpected error:", msg);
-    // Network error (ENOTFOUND, fetch failed, dll)
+    
+    // Check for PostgreSQL unique constraint violation (code 23505)
+    if (errorObj.code === "23505" || msg.includes("23505")) {
+      return {
+        success: false,
+        error: "Nomor WhatsApp ini sudah terdaftar, satu nomor hanya bisa daftar sekali.",
+      };
+    }
+    
     if (msg.includes("fetch failed") || msg.includes("ENOTFOUND") || msg.includes("ECONNREFUSED")) {
       return {
         success: false,
-        error: "Tidak dapat terhubung ke server. Periksa koneksi internet Anda lalu coba lagi.",
+        error: "Tidak dapat terhubung ke database. Periksa koneksi internet Anda lalu coba lagi.",
       };
     }
     return { success: false, error: `Terjadi kesalahan. Silakan coba lagi. (${msg})` };

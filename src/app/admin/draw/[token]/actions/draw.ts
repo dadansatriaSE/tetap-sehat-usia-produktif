@@ -1,6 +1,6 @@
 "use server";
 
-import { createClientServer } from "@/lib/supabase/server";
+import { sql } from "@/lib/db";
 
 export type EligiblePeserta = {
   id: string;
@@ -14,61 +14,36 @@ export type DrawResult =
   | { success: false; error: string };
 
 export async function getEligiblePeserta(): Promise<EligiblePeserta[]> {
-  const supabase = createClientServer();
-  const { data, error } = await supabase
-    .from("peserta")
-    .select("id, nama, no_wa, kupon_code")
-    .eq("status", "hadir")
-    .eq("is_pemenang", false);
-
-  if (error) throw error;
-  return data ?? [];
+  const data = await sql`SELECT id, nama, no_wa, kupon_code FROM peserta WHERE status = 'hadir' AND is_pemenang = false`;
+  return (data as EligiblePeserta[]) ?? [];
 }
 
 export async function getWinnerCount(): Promise<number> {
-  const supabase = createClientServer();
-  const { count, error } = await supabase
-    .from("peserta")
-    .select("id", { count: "exact", head: true })
-    .eq("is_pemenang", true);
-
-  if (error) throw error;
-  return count ?? 0;
+  const data = await sql`SELECT COUNT(id)::int as count FROM peserta WHERE is_pemenang = true`;
+  return data[0]?.count ?? 0;
 }
 
 export async function confirmWinner(id: string): Promise<DrawResult> {
-  const supabase = createClientServer();
+  try {
+    const current = await sql`SELECT COUNT(id)::int as count FROM peserta WHERE is_pemenang = true`;
+    const count = current[0]?.count ?? 0;
 
-  const { data: current, error: countErr } = await supabase
-    .from("peserta")
-    .select("id", { count: "exact", head: true })
-    .eq("is_pemenang", true);
+    if (count >= 5) {
+      return { success: false, error: "Semua 5 pemenang sudah terkonfirmasi." };
+    }
 
-  if (countErr) {
-    return { success: false, error: "Gagal memeriksa jumlah pemenang." };
+    const data = await sql`UPDATE peserta SET is_pemenang = true, menang_at = NOW() WHERE id = ${id} AND is_pemenang = false RETURNING id, nama, no_wa, kupon_code`;
+
+    if (!data || data.length === 0) {
+      return {
+        success: false,
+        error: "Peserta sudah dikonfirmasi sebagai pemenang.",
+      };
+    }
+
+    return { success: true, winner: data[0] as EligiblePeserta };
+  } catch (err: unknown) {
+    const errorObj = err as Error;
+    return { success: false, error: `Gagal mengkonfirmasi pemenang: ${errorObj.message}` };
   }
-
-  if ((current as unknown as number) >= 5) {
-    return { success: false, error: "Semua 5 pemenang sudah terkonfirmasi." };
-  }
-
-  const { data, error } = await supabase
-    .from("peserta")
-    .update({ is_pemenang: true, menang_at: new Date().toISOString() })
-    .eq("id", id)
-    .eq("is_pemenang", false)
-    .select("id, nama, no_wa, kupon_code");
-
-  if (error) {
-    return { success: false, error: "Gagal mengkonfirmasi pemenang." };
-  }
-
-  if (!data || data.length === 0) {
-    return {
-      success: false,
-      error: "Peserta sudah dikonfirmasi sebagai pemenang.",
-    };
-  }
-
-  return { success: true, winner: data[0] };
 }

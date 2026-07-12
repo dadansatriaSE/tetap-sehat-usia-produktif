@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
 import {
   fetchAllPeserta,
   searchByKupon,
@@ -48,20 +47,12 @@ export default function AdminPage() {
   }, [fetchData]);
 
   useEffect(() => {
-    const supabase = createClient();
-    const channel = supabase
-      .channel("peserta-realtime")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "peserta" },
-        () => {
-          fetchData();
-        }
-      )
-      .subscribe();
+    const interval = setInterval(() => {
+      fetchData();
+    }, 10000); // Polling setiap 10 detik
 
     return () => {
-      supabase.removeChannel(channel);
+      clearInterval(interval);
     };
   }, [fetchData]);
 
