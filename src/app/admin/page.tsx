@@ -278,8 +278,8 @@ export default function AdminPage() {
         <div className="bg-gradient-to-r from-blue-50 to-sky-50 border-b border-blue-100 px-4 py-3 flex items-center justify-between">
           <p className="font-semibold text-blue-800 text-sm">👥 Daftar Peserta <span className="text-blue-600 font-normal">({filtered.length} ditampilkan)</span></p>
         </div>
-        <CardContent className="p-0">
-          <Table>
+        <CardContent className="p-0 overflow-x-auto">
+          <Table className="min-w-[800px]">
             <TableHeader>
               <TableRow>
                 <TableHead>Nama</TableHead>
