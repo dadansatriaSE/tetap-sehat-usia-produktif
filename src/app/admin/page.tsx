@@ -274,12 +274,12 @@ export default function AdminPage() {
         />
       </div>
 
-      <Card className="border-0 shadow-md overflow-hidden">
+      <Card className="border-0 shadow-md">
         <div className="bg-gradient-to-r from-blue-50 to-sky-50 border-b border-blue-100 px-4 py-3 flex items-center justify-between">
           <p className="font-semibold text-blue-800 text-sm">👥 Daftar Peserta <span className="text-blue-600 font-normal">({filtered.length} ditampilkan)</span></p>
         </div>
-        <CardContent className="p-0 overflow-x-auto">
-          <Table className="min-w-[800px]">
+        <CardContent className="p-0 overflow-x-auto rounded-b-xl">
+          <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Nama</TableHead>
@@ -316,12 +316,12 @@ export default function AdminPage() {
                         {p.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-sm">
+                    <TableCell className="text-sm whitespace-nowrap">
                       {new Date(p.created_at).toLocaleDateString("id-ID")}
                     </TableCell>
-                    <TableCell className="text-sm">
+                    <TableCell className="text-sm whitespace-nowrap">
                       {p.checked_in_at
-                        ? new Date(p.checked_in_at).toLocaleString("id-ID")
+                        ? new Date(p.checked_in_at).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" })
                         : "-"}
                     </TableCell>
                     <TableCell className="text-right">
